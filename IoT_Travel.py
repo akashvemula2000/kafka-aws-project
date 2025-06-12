@@ -10,13 +10,20 @@ import time
 start_time = datetime.now()
 
 
-LA_COORDINATES = { "latitude": 34.0522, "longitude": -118.2437 }
-SF_COORDINATES = { "latitude": 37.7749, "longitude": -122.4194 }
+SD_COORDINATES = {
+    "latitude": 32.7157,
+    "longitude": -117.1611
+}
 
-LATITUDE_INCREMENT = (SF_COORDINATES['latitude'] - LA_COORDINATES['latitude']) / 100
-LONGITUDE_INCREMENT = (SF_COORDINATES['longitude'] - LA_COORDINATES['longitude']) / 100
+LA_COORDINATES = {
+    "latitude": 34.0522,
+    "longitude": -118.2437
+}
 
-start_location = LA_COORDINATES.copy()
+LATITUDE_INCREMENT = (LA_COORDINATES['latitude'] - SD_COORDINATES['latitude']) / 100
+LONGITUDE_INCREMENT = (LA_COORDINATES['longitude'] - SD_COORDINATES['longitude']) / 100
+
+start_location = SD_COORDINATES.copy()
 
 random.seed(42)
 
@@ -37,8 +44,8 @@ def get_next_time():
 def simulate_vehicle_movement():
     global start_location
 
-    start_location['latitude']+=random.uniform(-0.0005, 0.0005)
-    start_location['longitude']+=random.uniform(-0.0005, 0.0005)
+    start_location['latitude']+=LATITUDE_INCREMENT + random.uniform(-0.0005, 0.0005)
+    start_location['longitude']+=LONGITUDE_INCREMENT+ random.uniform(-0.0005, 0.0005)
 
     return start_location    
 
@@ -50,7 +57,7 @@ def generate_vehicle_data(device_id):
         'deviceId': device_id,
         'timestamp': get_next_time().isoformat(),
         'location' : (location['latitude'],location['longitude']),
-        'speed' : random.randint(0,50),
+        'speed' : random.randint(10,50),
         'direction': 'North-West',
         'make': 'BMW',
         'model': 'C500',
@@ -64,7 +71,7 @@ def generate_gps_data(device_id, timestamp, vehicle_type = 'private'):
         'id': uuid.uuid4(),
         'deviceId': device_id,
         'timestamp': timestamp,
-        'speed': random.uniform(0,50),
+        'speed': int(random.uniform(10,50)),
         'direction': 'North-West',
         'vehicle_type': vehicle_type
 
@@ -146,9 +153,9 @@ def simulate_journey(producer,device_id):
         weather_data = generate_weather_data(device_id,vehicle_data['timestamp'], vehicle_data['location'])
         emergency_incident_data = generate_emergency_incident_data(device_id, vehicle_data['timestamp'],vehicle_data['location'])
 
-        if (vehicle_data['location'][0] >= SF_COORDINATES['latitude'] and
-            vehicle_data['location'][1] <= SF_COORDINATES['longitude']):
-            print("Vehicle has reached San Francisco. Simulation ending...")
+        if (vehicle_data['location'][0] >= LA_COORDINATES['latitude'] and
+            vehicle_data['location'][1] <= LA_COORDINATES['longitude']):
+            print("Vehicle has reached Los Angeles. Simulation ending...")
             break
 
         produce_data_to_kafka(producer, vehicle_data, vehicle_topic)
@@ -158,7 +165,7 @@ def simulate_journey(producer,device_id):
         produce_data_to_kafka(producer, emergency_incident_data, emergency_topic)
 
 
-        time.sleep(5)
+        # time.sleep(5)
 
 try:
     simulate_journey(producer, "AkashVemula123")

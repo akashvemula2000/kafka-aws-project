@@ -36,8 +36,7 @@ services:
       - SPARK_RPC_ENCRYPTION=no
       - SPARK_MASTER_PORT=7077
       - HADOOP_USER_NAME=sparkuser
-      - AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
-      - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
+
     ports:
       - "8080:8080"  # Spark Master Web UI
       - "7077:7077"  # Spark Master Port

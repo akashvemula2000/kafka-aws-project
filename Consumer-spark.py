@@ -17,9 +17,6 @@ spark = SparkSession.builder \
         .config("spark.hadoop.fs.s3a.aws.credentials.provider",
                 "org.apache.hadoop.fs.s3a.SimpleAWSCredentialsProvider") \
         .config("spark.hadoop.security.authentication", "simple")\
-        .config("spark.hadoop.fs.s3a.connection.timeout", "60000") \
-        .config("spark.hadoop.fs.s3a.connection.establish.timeout", "5000") \
-        .config("spark.hadoop.fs.s3a.connection.maximum", "100") \
         .getOrCreate()
 
 
@@ -27,10 +24,7 @@ vehicle_schema = StructType([
     StructField("id", StringType()),  # UUID as string
     StructField("deviceId", StringType()),
     StructField("timestamp", TimestampType()),  # ISO string
-    StructField("location", StructType([
-        StructField("latitude", DoubleType()),
-        StructField("longitude", DoubleType())
-    ])),
+    StructField("location", StringType()),
     StructField("speed", IntegerType()),
     StructField("direction", StringType()),
     StructField("make", StringType()),
@@ -52,10 +46,7 @@ gps_schema = StructType([
 traffic_camera_schema = StructType([
     StructField("id", StringType()),
     StructField("deviceId", StringType()),
-    StructField("location", StructType([
-        StructField("latitude", DoubleType()),  # latitude
-        StructField("longitude", DoubleType())   # longitude
-    ])),
+    StructField("location", StringType()),
     StructField("cameraId", StringType()),
     StructField("timestamp", TimestampType()),
     StructField("snapshot", StringType())
@@ -64,10 +55,7 @@ traffic_camera_schema = StructType([
 weather_schema = StructType([
     StructField("id", StringType()),
     StructField("deviceId", StringType()),
-    StructField("location", StructType([
-        StructField("latitude", DoubleType()),
-        StructField("longitude", DoubleType())
-    ])),
+    StructField("location", StringType()),
     StructField("timestamp", TimestampType()),
     StructField("temperature", DoubleType()),
     StructField("weather_condition", StringType()),
@@ -82,10 +70,7 @@ emergency_schema = StructType([
     StructField("deviceId", StringType()),
     StructField("incidentId", StringType()),
     StructField("type", StringType()),
-    StructField("location", StructType([
-        StructField("latitude", DoubleType()),
-        StructField("longitude", DoubleType())
-    ])),
+    StructField("location", StringType()),
     StructField("timestamp", TimestampType()),
     StructField("status", StringType())
 ])
@@ -109,12 +94,24 @@ traffic_df = read_from_kafka("traffic_data",traffic_camera_schema)
 weather_df = read_from_kafka("weather_data",weather_schema)
 emergency_df = read_from_kafka("emergency_data",emergency_schema)
 
+
+
+# vehicle_df.writeStream \
+#     .format("csv") \
+#     .outputMode("append") \
+#     .option("checkpointLocation", "./checkpoints/vehicle_data")\
+#     .option("path", "./data/vehicle_data")\
+#     .option("header", True)\
+#     .start() \
+#     .awaitTermination()
+
 # vehicle_df.writeStream \
 #     .format("console") \
 #     .outputMode("append") \
 #     .option("truncate", False) \
 #     .start() \
 #     .awaitTermination()
+
 
 def stream_writer(data,checkpoint, output):
     return data.writeStream\
@@ -123,7 +120,6 @@ def stream_writer(data,checkpoint, output):
     .option("path", output)\
     .outputMode("append")\
     .start()
-    
     
 
 q1 = stream_writer(
