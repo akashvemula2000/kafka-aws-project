@@ -163,7 +163,7 @@ def simulate_journey(producer,device_id):
         produce_data_to_kafka(producer, weather_data, weather_topic)
         produce_data_to_kafka(producer, emergency_incident_data, emergency_topic)
 
-        # time.sleep(5)
+        time.sleep(5)
 
 if __name__ == "__main__":
 
