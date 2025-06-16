@@ -20,8 +20,8 @@ LA_COORDINATES = {
     "longitude": -118.2437
 }
 
-LATITUDE_INCREMENT = (LA_COORDINATES['latitude'] - SD_COORDINATES['latitude']) / 100
-LONGITUDE_INCREMENT = (LA_COORDINATES['longitude'] - SD_COORDINATES['longitude']) / 100
+LATITUDE_INCREMENT = (LA_COORDINATES['latitude'] - SD_COORDINATES['latitude']) / 250
+LONGITUDE_INCREMENT = (LA_COORDINATES['longitude'] - SD_COORDINATES['longitude']) / 250
 
 start_location = SD_COORDINATES.copy()
 
@@ -59,10 +59,10 @@ def generate_vehicle_data(device_id):
         'location' : (location['latitude'],location['longitude']),
         'speed' : random.randint(10,50),
         'direction': 'North-West',
-        'make': 'BMW',
-        'model': 'C500',
+        'make': 'Tesla',
+        'model': 'Model 3',
         'year': 2025,
-        'fueltype': 'Hybrid'      
+        'fueltype': 'Electric'      
     }
 
 
@@ -120,7 +120,7 @@ producer = KafkaProducer(bootstrap_servers=['0.0.0.0:9092'])
 
 
 def on_delivery_success(record_metadata):
-    print(f"Message delivered to {record_metadata.topic} [partition {record_metadata.partition}] at offset {record_metadata.offset}")
+    print(f"Message delivered to {record_metadata.topic} at offset {record_metadata.offset}")
 
 def on_delivery_error(excp):
     print(f"Delivery failed: {excp}")
@@ -130,7 +130,6 @@ def default_serializer(obj):
     if isinstance(obj, uuid.UUID):
         return str(obj)
     raise TypeError(f"Type {type(obj)} not serializable")
-
 
 
 def produce_data_to_kafka(producer,data,topic):
@@ -164,13 +163,14 @@ def simulate_journey(producer,device_id):
         produce_data_to_kafka(producer, weather_data, weather_topic)
         produce_data_to_kafka(producer, emergency_incident_data, emergency_topic)
 
-
         # time.sleep(5)
 
-try:
-    simulate_journey(producer, "AkashVemula123")
-except KeyboardInterrupt:
-    print("Simulation is stopped by user")
+if __name__ == "__main__":
 
-except Exception as e:
-    print("Unexpected Error occurred",e)
+    try:
+        simulate_journey(producer, "AkashVemula123")
+    except KeyboardInterrupt:
+        print("Simulation is stopped by user")
+
+    except Exception as e:
+        print("Unexpected Error occurred",e)
