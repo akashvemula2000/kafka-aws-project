@@ -110,17 +110,6 @@ def main():
     emergency_df = read_from_kafka("emergency_data",emergency_schema)
 
 
-
-    # vehicle_df.writeStream \
-    #     .format("csv") \
-    #     .outputMode("append") \
-    #     .option("checkpointLocation", "./checkpoints/vehicle_data")\
-    #     .option("path", "./data/vehicle_data")\
-    #     .option("header", True)\
-    #     .start() \
-    #     .awaitTermination()
-
-
     def stream_writer(data,checkpoint, output):
         return data.writeStream\
         .format("parquet")\
