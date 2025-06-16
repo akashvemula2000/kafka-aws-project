@@ -31,14 +31,12 @@ The main components of the project are organized as follows:
 
 ```
 Kafka-IoT/
-├── Consumer-spark.py     
-├── IoT_Travel.py         
-├── Weather.py           
-├── docker-compose.yml   
-├── requirements.txt     
-├── reset_kafka_topics.sh
-├── config.py            
-└── data/                
+├── requirements.txt
+├── IoT_Travel.py   
+├── Consumer-spark.py                  
+├── docker-compose.yml      
+├── reset_kafka_topics.sh       
+└── config.yml               
 ```
 
 ## 🚀 Quick Start
@@ -134,10 +132,6 @@ GROUP BY w.weather_condition;
 - Spark Master UI: http://localhost:8080
 - Spark Worker 1 UI: http://localhost:8081
 - Spark Worker 2 UI: http://localhost:8082
-
-## Kafka CLI Reference
-
-A reference file `Kafka CLI Commands` is included in the project for common Kafka operations.
 
 ## Data Processing
 
